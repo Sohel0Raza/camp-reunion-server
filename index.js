@@ -29,10 +29,19 @@ async function run() {
     const classesCollection = client.db('campReunionDB').collection('classes')
 
     //classes 
-    app.get('/classes', async(req, res)=>{
+    app.get('/allClass', async(req, res)=>{
         const result = await classesCollection.find().toArray()
         res.send(result)
     })
+    app.get('/populerClass', async(req, res)=>{
+        const query = {}
+        const options ={
+            sort:{"available_seats": -1}
+        }
+        const result = await classesCollection.find(query,options).limit(6).toArray()
+        res.send(result)
+    })
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
