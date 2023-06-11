@@ -142,6 +142,13 @@ async function run() {
       const result = await classesCollection.find().toArray();
       res.send(result);
     });
+    
+     app.post("/allClass", async (req, res) => {
+      const selectClass = req.body;
+      const result = await classesCollection.insertOne(selectClass);
+      res.send(result);
+    });
+
     app.get("/populerClass", async (req, res) => {
       const query = {};
       const options = {
@@ -153,6 +160,7 @@ async function run() {
         .toArray();
       res.send(result);
     });
+
     app.get("/populerInstructor", async (req, res) => {
       const query = {};
       const options = {
@@ -181,6 +189,7 @@ async function run() {
       const result = await selectCollection.find(query).toArray();
       res.send(result);
     });
+
     app.post("/selectClass", async (req, res) => {
       const selectClass = req.body;
       const result = await selectCollection.insertOne(selectClass);
