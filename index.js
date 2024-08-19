@@ -1,13 +1,16 @@
-const express = require("express");
-const cors = require("cors");
-const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-require("dotenv").config();
-const jwt = require("jsonwebtoken");
+import express from "express";
+import cors from "cors";
+import { MongoClient, ServerApiVersion, ObjectId } from "mongodb";
+import dotenv from "dotenv";
+import pkg from 'jsonwebtoken';
+import Stripe from 'stripe'
+const { sign, verify } = pkg;
 const app = express();
-const stripe = require("stripe")(process.env.PAYMENT_SECRET_KEY);
+const stripe = new Stripe(process.env.PAYMENT_SECRET_KEY);
 const port = process.env.PORT || 5000;
 
 //middelwire
+dotenv.config();
 app.use(cors());
 app.use(express.json());
 
@@ -21,7 +24,7 @@ const verifyJWT = (req, res, next) => {
 
   const token = authorization.split(" ")[1];
 
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+  verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
       return res
         .status(401)
@@ -46,7 +49,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-     client.connect();
+    client.connect();
 
     const classesCollection = client.db("campReunionDB").collection("classes");
     const selectCollection = client
@@ -58,7 +61,7 @@ async function run() {
     //jwt api
     app.post("/jwt", (req, res) => {
       const user = req.body;
-      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+      const token = sign(user, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "1h",
       });
       res.send({ token });
@@ -133,6 +136,7 @@ async function run() {
       verifyAdmin,
       async (req, res) => {
         const id = req.params.id;
+console.log('✌️id --->', id);
         const query = { _id: new ObjectId(id) };
         const updateDoc = {
           $set: {
@@ -265,8 +269,8 @@ async function run() {
       const query = { email: email };
       const options = {
         sort: { date: -1 },
-      }
-      const result = await paymentCollection.find(query,options).toArray();
+      };
+      const result = await paymentCollection.find(query, options).toArray();
       res.send(result);
     });
     // Send a ping to confirm a successful connection
