@@ -10,6 +10,12 @@ const stripe = new Stripe(process.env.PAYMENT_SECRET_KEY);
 const port = process.env.PORT || 5000;
 
 //middelwire
+// const corsOptions = {
+//   origin: '*',
+//   methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+//   allowedHeaders: ['Content-Type', 'Authorization']
+// };
+
 dotenv.config();
 app.use(cors());
 app.use(express.json());
@@ -136,7 +142,6 @@ async function run() {
       verifyAdmin,
       async (req, res) => {
         const id = req.params.id;
-console.log('✌️id --->', id);
         const query = { _id: new ObjectId(id) };
         const updateDoc = {
           $set: {
